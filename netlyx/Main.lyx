@@ -455,35 +455,599 @@ G。
 \end_layout
 
 \begin_layout Subsection
-命令
+基础命令
 \end_layout
 
 \begin_layout Subsubsection
-查看命令
+查看规则命令
 \end_layout
 
 \begin_layout Standard
+查看对应表的所有规则。-v表示verbose，详细的。
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
 
+\begin_layout Plain Layout
+
+iptables -t <表名> (-v) -L
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+查看指定表指定链的所有规则。-n表示不解析IP地址，–line-number表示显示规则的序号，-x表示显示计数器的精确值。
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+iptables -t (--line-number) <表名> (-nvx) -L <链名>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+为了方便上述选项常被表示为：
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+iptables -line -t <表名> -nvxL (<链名>)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+添加规则命令
+\end_layout
+
+\begin_layout Standard
+在某条链的尾部（-A）添加一条规则
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{blue}},keywordstyle={\color{black}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+iptables -t <表名> -A <链名> <匹配条件> -j DROP
+\end_layout
+
+\begin_layout Plain Layout
+
+# 将原地址192.168.1.146的包丢弃
+\end_layout
+
+\begin_layout Plain Layout
+
+ipatables -t filter -A INPUT -s 192.168.1.146 -j DROP
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+在指定链的首部添加一条规则
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+iptables -t <表名> -I <链名> <匹配条件> -j <动作>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+在指定表的指定链的指定位置添加一条规则
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+iptables -t <表名> -I <链名> <规则序号> <匹配条件> -j <动作>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+删除规则
+\end_layout
+
+\begin_layout Standard
+按规则序号进行删除
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+iptables -t <表名> -D <链名> <规则序号>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+按照具体的匹配条件与动作进行删除
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+iptables -t <表名> -D <链名> <匹配条件> -j <动作>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+删除指定表中的指定链中的所有规则
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+iptables -t <表名> -F <链名>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+删除指定表的所有规则
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+iptables -t <表名> -F
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+修改规则
+\end_layout
+
+\begin_layout Standard
+修改指定表中指定链的指定规则
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+iptables -t <表名> -R <链名> <规则序号> <原本的匹配规则> -j <动作>
+\end_layout
+
+\begin_layout Plain Layout
+
+iptables -t filter -R 3 -s 192.168.1.146 -j ACCEPT
+\end_layout
+
+\begin_layout Plain Layout
+
+# -s 192.168.1.146为原本的匹配条件，如果忽略此匹配条件，修改后的规则源地址可能会变成0.0.0.0/0
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+修改指定表的指定链的默认策略（默认动作），并非修改规则
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+iptables -t <表名> -P <链名> <动作>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+保存规则
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# 方法一
+\end_layout
+
+\begin_layout Plain Layout
+
+service iptables save
+\end_layout
+
+\begin_layout Plain Layout
+
+#方法二
+\end_layout
+
+\begin_layout Plain Layout
+
+iptables -save >/etc/sysconfig/iptables
+\end_layout
+
+\begin_layout Plain Layout
+
+iptables -restore </etc/sysconfig/iptables
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+实验环境
+\end_layout
+
+\begin_layout Standard
+使用vmware fusion搭建实验环境，使用虚拟主机 <=> 虚拟路由 <=> 虚拟服务器形式。虚拟主机和虚拟路由均为虚拟机，虚拟服务器在本机搭建。
+\end_layout
+
+\begin_layout Standard
+vmware默认使用NAT模式并使用虚拟网卡vmnet8与主机共享网络。具体结构如下图所示：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/vmware.png
+	lyxscale 30
+	width 70line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+vmware NAT模式示意图：我们在
+\shape italic
+/Library/Preferences/VMware Fusion/vmnet8/dhcpd.conf
+\shape default
+中配置虚拟DHCP服务器分配ip地址范围为172.16.176.128-172.16.176.254。两台试验用虚拟机使用固定ip 172.16.176.253和172.16.176.
+137。vmnet8的ip为172.16.176.2。主机的ip为192.168.43.245。
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+我们使用虚拟机1为客户端，虚拟机2为路由，主机网卡为服务器端
 \end_layout
 
 \begin_layout Part
 l7filter
 \end_layout
 
+\begin_layout Section
+实验
+\end_layout
+
+\begin_layout Subsection
+实验环境
+\end_layout
+
 \begin_layout Standard
-本模板来自谢益辉，若有任何疑问，请发邮件至xie@yihui.name或到 
-\begin_inset Flex URL
-status collapsed
+下载CentOS-6.9-x86_64-minimal.iso。
+\end_layout
+
+\begin_layout Paragraph
+vmware-tools install failed
+\end_layout
+
+\begin_layout Standard
+在安装时正会出现vmware-tools install failed错误无法进入系统，自定义虚拟机安装。
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
 
 \begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/vmware-tools install failed.png
+	lyxscale 30
+	width 60line%
 
-http://yihui.name
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+vmware-tools install failed
 \end_layout
 
 \end_inset
 
-留言。注意前面已经声明，本文档默认设置为使用Adobe中文字体，如果你是Linux用户，这些字体很可能不存在，这种情况下请使用任意可用的非\SpecialChar TeX
-中文字体。
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+虚拟机未和mac处于同一子网内
+\end_layout
+
+\begin_layout Standard
+原因为eth0网卡未设置成boot自启，修改
+\shape italic
+/etc/sysconfig/network-scripts/ifcfg-eth0
+\shape default
+中的onboot改为yes。重启网络服务后正常`service network restart'，如下图所示：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/vm_boot_err.png
+	lyxscale 10
+	width 60line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+重启网络服务
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+基本配置
+\end_layout
+
+\begin_layout Standard
+主要需要更新源、安装git、make、gcc、automake、autoconf、libtool等软件包，配置好ssh和vmware-tools方便管理使用虚拟
+机：
+\end_layout
+
+\begin_layout Enumerate
+修改
+\shape italic
+/etc/yum.repos.d/CentOS-Base.repo
+\shape default
+配置文件，使用命令makecache更新源；
+\end_layout
+
+\begin_layout Enumerate
+下载软件包安装
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+[root@centos ~]# yum install -y zsh git vim gcc automake autoconf libtool
+ make patch 
+\backslash
+&
+\backslash
+& sh -c 
+\backslash
+$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools
+/install.sh)"
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+修改配置文件
+\shape italic
+/etc/ssh/sshd_config
+\shape default
+打开22端口的服务，使用命令重启sshd：service sshd restart；
+\end_layout
+
+\begin_layout Enumerate
+挂载vmware-tools光驱在
+\shape italic
+/mnt/cdrom
+\shape default
+上，这是一个只读文件系统，把压缩包拷出来再解压，安装好了vmware-tools，方便管理文件。
+\end_layout
+
+\begin_layout Subsection
+实验内容
+\end_layout
+
+\begin_layout Subsubsection
+编译内核
+\end_layout
+
+\begin_layout Standard
+准备好linux-2.6.35.8.tar.gz和netfilter-layer7-v2.23.tar.gz两个个文件来编译内核：
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+cd /root tar xf linux-2.6.35.8.tar.gz -C /usr/src 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    && tar xf netfilter-layer7-v2.23.tar.gz 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    && ln -s /usr/src/linux-2.6.35.8 /usr/src/linux
+\end_layout
+
+\begin_layout Plain Layout
+
+cd /usr/src/linux patch -p1 < /root/netsec/netfilter-layer7-v2.23/kernel-2.6.35-lay
+er7-2.23.patch
+\end_layout
+
+\begin_layout Plain Layout
+
+cp /boot/config-2.6.32-696.el6.x86_64 /usr/src/linux/.config make menuconfig　
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+发现报错：unable to find the ncurses libraries。原因是缺少ncurses-devel，使用yum install
+ ncurses-devel命令重新安装：
 \end_layout
 
 \begin_layout Section

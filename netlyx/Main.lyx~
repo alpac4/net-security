@@ -50,7 +50,6 @@
 \use_package stackrel 1
 \use_package stmaryrd 1
 \use_package undertilde 1
-\use_package listings 1
 \cite_engine basic
 \cite_engine_type default
 \biblio_style plain
@@ -461,102 +460,6 @@ G。
 
 \begin_layout Subsubsection
 查看命令
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "language=Python,numbers=left,numberstyle={\tiny},stepnumber=1,breaklines=true,tabsize=4,frame=shadowbox,commentstyle={\color{red!50!green!50!blue!50}},rulesepcolor={\color{red!20!green!20!blue!20}},keywordstyle={\color{blue!90}\bfseries},showstringspaces=false,stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,basicstyle={\footnotesize},showspaces=false,flexiblecolumns=true,breaklines=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-import time 
-\end_layout
-
-\begin_layout Plain Layout
-
-import os.path 
-\end_layout
-
-\begin_layout Plain Layout
-
-import wx 
-\end_layout
-
-\begin_layout Plain Layout
-
-import scipy 
-\end_layout
-
-\begin_layout Plain Layout
-
-import matplotlib.pyplot as plt 
-\end_layout
-
-\begin_layout Plain Layout
-
-from wx.lib.wordwrap import wordwrap
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-Copyright =
-\backslash
- """ Copyright (c) 2011 Luis Andre Fernandes
-\end_layout
-
-\begin_layout Plain Layout
-
-This work is provided by the copyright holders and contributors 'as is'
-\backslash
- and any express or implied warranties, including, but not limited to,
-\backslash
- the implied warranties of merchantability and fitness for a particular
-\backslash
- purpose are disclaimed.
- In no event shall the copyright owener or contributors
-\backslash
- be liable for any direct, indirect, incidental, special, exemplary, or
-\backslash
- consequential damages (including, but not limited to, procurement of substitute
-\backslash
- goods or services; loss of use, data, or profits; or business interruption)
-\backslash
- however caused and on any theory of liability, whether in contract, strict
-\backslash
- liability, or tort (including negligence or otherwise) arising in any way
- out
-\backslash
- of the use of this work, even if advised of the possibility of such damage.
-\end_layout
-
-\begin_layout Plain Layout
-
-Copying and distribution of this file, with or without modification,
-\backslash
- are permitted in any medium without royalty provided the copyright
-\backslash
- notice and this notice are preserved.
- """
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-error = [0,0,1,1,1,1] # Variable flag to trigger Frame.ErrorAlert()
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
