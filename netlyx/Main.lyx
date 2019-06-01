@@ -837,11 +837,12 @@ l7filter
 \end_layout
 
 \begin_layout Subsection
-实验环境
+准备实验环境
 \end_layout
 
 \begin_layout Standard
-下载CentOS-6.9-x86_64-minimal.iso。
+使用Centos6.9和ubuntu16.04作为测试环境。下载CentOS-6.9-x86_64-minimal.iso, Unbuntu16.04.iso。安装Cent
+os时出现过以下问题，已解决。
 \end_layout
 
 \begin_layout Paragraph
@@ -939,8 +940,8 @@ status open
 \end_layout
 
 \begin_layout Standard
-主要需要更新源、安装git、make、gcc、automake、autoconf、libtool等软件包，配置好ssh和vmware-tools方便管理使用虚拟
-机：
+Centos作为转发端做以下配置：更新源、安装git、make、gcc、automake、autoconf、libtool等软件包，配置好ssh和vmware-
+tools方便管理使用虚拟机：
 \end_layout
 
 \begin_layout Enumerate
@@ -953,6 +954,10 @@ status open
 
 \begin_layout Enumerate
 下载软件包安装
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
 \begin_inset listings
 lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
 inline false
@@ -976,6 +981,7 @@ $(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/too
 
 \end_layout
 
+\end_deeper
 \begin_layout Enumerate
 修改配置文件
 \shape italic
@@ -1047,9 +1053,803 @@ cp /boot/config-2.6.32-696.el6.x86_64 /usr/src/linux/.config make menuconfig　
 
 \begin_layout Standard
 发现报错：unable to find the ncurses libraries。原因是缺少ncurses-devel，使用yum install
- ncurses-devel命令重新安装：
+ ncurses-devel命令重新安装
 \end_layout
 
+\begin_layout Standard
+编译内核时需要将以下几项编译进入内核模块：Netfilter connection tracking support 、"layer7" match
+ support 、"iprange" address range match support、IPv4 connection tracking
+ support (required for NAT) 和 Iptables Support。步骤如下所示：
+\end_layout
+
+\begin_layout Enumerate
+先进入Core Netfilter Configuration: Networking support ---> Networking options
+ ---> Network packet filtering framework (Netfilter) ---> Core Netfilter
+ Configuration见到如下界面：
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/core.png
+	lyxscale 20
+	width 60line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+内核编译Core Netfilter Configuration选项
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+分别把 **Netfilter connection tracking support** 、**"layer7" match support**
+ 、**"iprange" address range match support**添加到内核编译项中。
+\end_layout
+
+\begin_layout Enumerate
+然后添加FTP support和 PPtP support （根据文档描述 If you don't know what you're doing,
+ go ahead and enable all of them）
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+再进入IP: Netfilter Configuration: Networking support ---> Networking options
+ ---> Network packet filtering framework (Netfilter)--->IP: Netfilter Configurat
+ion 见到如下界面：
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/conf.png
+	lyxscale 20
+	width 60line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+内核编译Netfilter Configuration选项
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+把 IPv4 connection tracking support (required for NAT) 、Iptables Support
+ 和 Full NAT添加到内核编译选项中。
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+开始编译内核，因为只分配了一个核，不用使用多核编译。等待一段时间编译完成，最后安装内核模块并且写入新的grub
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+make
+\end_layout
+
+\begin_layout Plain Layout
+
+make modules_install 
+\end_layout
+
+\begin_layout Plain Layout
+
+make install 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+这里出现了几个module找不到的错误，因为当前内核有的模块在编译新的kernal时没有选择。不影响这次实验，检查grub.conf里写入了新的内核的grub,
+ 确实已经包含了2.6.32的grub。
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/boot.png
+	lyxscale 20
+	width 60line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+编译新内核后的/boot/grub/grub.conf文件
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+重新启动后查看新的内核版本，发现已经编译成功了：
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/changek.png
+	lyxscale 20
+	width 60line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+重新启动后查看内核版本
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Subsubsection
+安装iptables
+\end_layout
+
+\begin_layout Enumerate
+下载iptables-1.4.21.tar.bz2源码。存入netsec目录, 开始源码编译安装iptables
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+mkdir iptables
+\end_layout
+
+\begin_layout Plain Layout
+
+cp /etc/init.d/iptables iptables/ #备份iptables启动脚本 
+\end_layout
+
+\begin_layout Plain Layout
+
+cp /etc/sysconfig/iptables-config ./ #备份iptables配置文档
+\end_layout
+
+\begin_layout Plain Layout
+
+tar xf iptables-1.4.21.tar.bz2 cp netfilter-layer7-v2.23/iptables-1.4.3forward-for-kern
+el-2.6.20forward/libxt_layer7.* iptables-1.4.21/extensions #把l7filter的拓展模块移到iptables的
+extention目录 
+\end_layout
+
+\begin_layout Plain Layout
+
+cd iptables-1.4.21 
+\end_layout
+
+\begin_layout Plain Layout
+
+./configure --prefix=/usr --with-ksource=/usr/src/linux 
+\end_layout
+
+\begin_layout Plain Layout
+
+make # 编译
+\end_layout
+
+\begin_layout Plain Layout
+
+make install # 安装
+\end_layout
+
+\begin_layout Plain Layout
+
+cp iptables-config /etc/sysconfig/iptables-config # 复制配置文档
+\end_layout
+
+\begin_layout Plain Layout
+
+cp iptables/iptables /etc/init.d/iptables # 复制启动脚本
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+最后把/etc/init.d/iptables启动脚本中的如下部分的/sbin修改为/usr/sbin, 如下所示
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+if [ ! -x /usr/sbin/$IPTABLES ]; then
+\end_layout
+
+\begin_layout Plain Layout
+
+echo -n $"${IPTABLES}:/usr/sbin/$IPTABLES does not exist."; warning; echo
+\end_layout
+
+\begin_layout Plain Layout
+
+exit 5 fi
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Subsubsection
+安装协议特征包
+\end_layout
+
+\begin_layout Enumerate
+l7filter过滤各种协议特征需要协议特征包，直接解压安装即可：
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+tar xf l7-protocols-2009-05-28 
+\end_layout
+
+\begin_layout Plain Layout
+
+cd l7-protocols-2009-05-28 
+\end_layout
+
+\begin_layout Plain Layout
+
+make install  
+\end_layout
+
+\begin_layout Plain Layout
+
+ls protocols #查看支持的协议，如下所示
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/protocol.png
+	lyxscale 20
+	width 60line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+l7filter过滤支持协议
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Subsubsection
+开始测试
+\end_layout
+
+\begin_layout Standard
+测试环境：ubuntu16.04，centos 6.9.
+ 两台主机在同一子网内，配置ubuntu默认网关为centos, 这样ubuntu如果需要连接互联网全部都需要通过centos转发流量。
+\end_layout
+
+\begin_layout Enumerate
+首先查看centos的ip地址：192.168.125.174
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/ifconfig.png
+	lyxscale 20
+	width 60line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+ifconfg查看centos的ip地址
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+配置centos支持转发功能：修改 /etc/sysctl.conf ，把net.ipv4.ip_forward的值改为1，最后使用sysctl -p完成修改
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+net.ipv4.ip_forward = 1 
+\end_layout
+
+\begin_layout Plain Layout
+
+net.ipv4.conf.default.rp_filter = 1 
+\end_layout
+
+\begin_layout Plain Layout
+
+net.ipv4.conf.default.accept_source_route = 0 
+\end_layout
+
+\begin_layout Plain Layout
+
+kernel.sysrq = 0 
+\end_layout
+
+\begin_layout Plain Layout
+
+kernel.core_uses_pid = 1 
+\end_layout
+
+\begin_layout Plain Layout
+
+net.ipv4.tcp_syncookies = 1 
+\end_layout
+
+\begin_layout Plain Layout
+
+kernel.msgmnb = 65536 
+\end_layout
+
+\begin_layout Plain Layout
+
+kernel.msgmax = 65536
+\end_layout
+
+\begin_layout Plain Layout
+
+kernel.shmall = 4294967296
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+配置ubuntu设置默认网关为centos的ip地址，先查看默认网关可以看到vmnet8的中有一个默认网关192.168.125.2
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+Destination     Gateway         Genmask         Flags Metric Ref    Use
+ Iface 
+\end_layout
+
+\begin_layout Plain Layout
+
+0.0.0.0         192.168.125.2   0.0.0.0         UG    100    0        0 ens33 
+\end_layout
+
+\begin_layout Plain Layout
+
+169.254.0.0     0.0.0.0         255.255.0.0     U     1000   0        0 ens33 
+\end_layout
+
+\begin_layout Plain Layout
+
+192.168.125.0   0.0.0.0         255.255.255.0   U     100    0        0 ens33
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+删除这个默认网关后添加192.168.125.174为默认网关，再次查看默认网关
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sudo route del default gw 192.168.125.2
+\end_layout
+
+\begin_layout Plain Layout
+
+sudo route add default gw 192.168.125.174
+\end_layout
+
+\begin_layout Plain Layout
+
+route -n
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/gateway.png
+	lyxscale 20
+	width 60line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+修改ubuntu的默认网关
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+配置iptables进制http协议前ubuntu的访问情况
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/before.png
+	lyxscale 20
+	width 60line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+配置丢弃http包前的ubuntu访问情况
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+然后查看虚拟路由表
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+iptables -A FORWARD -s 192.168.125.0/24 -m layer7 --l7proto http -j DROP
+\end_layout
+
+\begin_layout Plain Layout
+
+iptables -t filter -L
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/route-table.png
+	lyxscale 20
+	width 60line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+配置丢弃http包后的centos虚拟路由表
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+配置iptables使用l7filter进制http访问后访问情况如下，实验成功
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/after.png
+	lyxscale 20
+	width 60line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+配置丢弃http包后的ubuntu访问情况
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
 \begin_layout Section
 小结
 \end_layout
