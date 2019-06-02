@@ -267,14 +267,14 @@ ipatables及l7filter的使用
 
 \begin_layout Abstract
 ipatables是一个常用的包过滤防火墙应用。但是，用户的安全设定实际上是由操作系统内部的一个数据包处理模块（netfilter）执行的，我们可以把iptab
-les看做一个客户端代理。iptables的核心为四表五链。四表为raw表、mangle表、net表、filter表。五链为PREROUTING
- INPUT FORWARD OUTPUT POATROUTING。我们可以向iptables中加入不同的过滤规则，实现特定功能。在本次实验中我们测试了ipta
-bles的基本accept、drop、reject动作和nat过滤功能。
+les看做一个客户端代理。iptables的核心为四表五链。四表为raw表、mangle表、net表、filter表。五链为PREROUTING、INPUT、F
+ORWARD、OUTPUT、POATROUTING。我们可以向iptables中加入不同的过滤规则，实现特定功能。在本次实验中我们测试了iptables的基本a
+ccept、drop、reject动作和nat过滤功能。
 \end_layout
 
 \begin_layout Abstract
 然而netfilter不带有应用层过滤的功能。想要实现应用层协议的过滤，我们选用了l7filter。l7filter从2013年就没有维护，必须选择较老的操作系
-统，在本次实验中我们选用centos6.9进行实验。实验需要先对内核打补丁，增加iptables根据应用层协议类型过滤包的功能。完成试验后，能针对性的过滤应用层协
+统，在本次实验中我们选用centos6.9进行实验。实验需要先对内核打补丁，增加iptables根据应用层协议类型过滤包的功能。完成试验后，能针对性地过滤应用层协
 议为http、qq等的包。
 \begin_inset Newline newline
 \end_inset
