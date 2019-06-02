@@ -2781,8 +2781,7 @@ status open
 
 \end_deeper
 \begin_layout Enumerate
-l7filter支持的过滤协议中还包括qq、迅雷、pop3、telnet、tor、ssl等。不过因为l7filter已经没有人在维护了，测试这些协议的时候出现一
-些bug。就没有继续深究下去
+l7filter支持的过滤协议中还包括qq、迅雷、pop3、
 \end_layout
 
 \begin_layout Section
