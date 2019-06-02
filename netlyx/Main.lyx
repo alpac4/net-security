@@ -37,7 +37,16 @@
 \float_placement h
 \paperfontsize default
 \spacing single
-\use_hyperref false
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder true
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
 \papersize default
 \use_geometry true
 \use_package amsmath 1
@@ -2125,7 +2134,7 @@ make install
 
 \end_deeper
 \begin_layout Enumerate
-这里出现了几个module找不到的错误，因为当前内核有的模块在编译新的kernal时没有选择。不影响这次实验，检查grub.conf里写入了新的内核的grub,
+这里出现了几个module找不到的错误，因为当前内核有的模块在编译新的kernal时没有选择。不影响这次实验，检查grub.conf里写入了新的内核的grub，
  确实已经包含了2.6.32的grub。
 \end_layout
 
@@ -2226,7 +2235,7 @@ status open
 \end_layout
 
 \begin_layout Enumerate
-下载iptables-1.4.21.tar.bz2源码。存入netsec目录, 开始源码编译安装iptables
+下载iptables-1.4.21.tar.bz2源码。存入netsec目录，开始源码编译安装iptables：
 \end_layout
 
 \begin_deeper
@@ -2295,7 +2304,7 @@ cp iptables/iptables /etc/init.d/iptables # 复制启动脚本
 
 \end_deeper
 \begin_layout Enumerate
-最后把/etc/init.d/iptables启动脚本中的如下部分的/sbin修改为/usr/sbin, 如下所示
+最后把/etc/init.d/iptables启动脚本中的如下部分的/sbin修改为/usr/sbin，如下所示。
 \end_layout
 
 \begin_deeper
@@ -2405,7 +2414,7 @@ l7filter过滤支持协议
 
 \begin_layout Standard
 测试环境：ubuntu16.04，centos 6.9.
- 两台主机在同一子网内，配置ubuntu默认网关为centos, 这样ubuntu如果需要连接互联网全部都需要通过centos转发流量。
+ 两台主机在同一子网内，配置ubuntu默认网关为centos，这样ubuntu如果需要连接互联网全部都需要通过centos转发流量。
 \end_layout
 
 \begin_layout Enumerate
@@ -2446,7 +2455,7 @@ ifconfg查看centos的ip地址
 \end_layout
 
 \begin_layout Enumerate
-配置centos支持转发功能：修改 /etc/sysctl.conf ，把net.ipv4.ip_forward的值改为1，最后使用sysctl -p完成修改
+配置centos支持转发功能：修改 /etc/sysctl.conf ，把net.ipv4.ip_forward的值改为1，最后使用sysctl -p完成修改；
 \end_layout
 
 \begin_deeper
@@ -2508,7 +2517,7 @@ kernel.shmall = 4294967296
 
 \end_deeper
 \begin_layout Enumerate
-配置ubuntu设置默认网关为centos的ip地址，先查看默认网关可以看到vmnet8的中有一个默认网关192.168.125.2
+配置ubuntu设置默认网关为centos的ip地址，先查看默认网关可以看到vmnet8的中有一个默认网关192.168.125.2；
 \end_layout
 
 \begin_deeper
@@ -2546,7 +2555,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use
 
 \end_deeper
 \begin_layout Enumerate
-删除这个默认网关后添加192.168.125.174为默认网关，再次查看默认网关
+删除这个默认网关后添加192.168.125.174为默认网关，再次查看默认网关；
 \end_layout
 
 \begin_deeper
@@ -2614,7 +2623,7 @@ status open
 
 \end_deeper
 \begin_layout Enumerate
-配置iptables进制http协议前ubuntu的访问情况
+配置iptables进制http协议前ubuntu的访问情况；
 \end_layout
 
 \begin_deeper
@@ -2664,7 +2673,7 @@ status open
 
 \end_deeper
 \begin_layout Enumerate
-然后查看虚拟路由表
+然后查看虚拟路由表；
 \end_layout
 
 \begin_deeper
@@ -2735,7 +2744,7 @@ status open
 
 \end_deeper
 \begin_layout Enumerate
-配置iptables使用l7filter进制http访问后访问情况如下，实验成功
+配置iptables使用l7filter进制http访问后访问情况如下，实验成功。
 \end_layout
 
 \begin_deeper
@@ -2783,7 +2792,7 @@ status open
 \end_deeper
 \begin_layout Enumerate
 l7filter支持的过滤协议中还包括qq、迅雷、pop3、telnet、tor、ssl等。不过因为l7filter已经没有人在维护了，测试这些协议的时候出现一
-些bug。就没有继续深究下去
+些bug。就没有继续深究下去。
 \end_layout
 
 \begin_layout Standard
