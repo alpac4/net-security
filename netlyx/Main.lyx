@@ -266,9 +266,10 @@ ipatables及l7filter的使用
 \end_layout
 
 \begin_layout Abstract
-ipatables是一个常用的包过滤防火墙应该用。它将用户的安全设定执行到操作系统内部的一个数据包处理模块netfilter。iptables的核心为四表五链。
-四表为raw表、mangle表、net表。五链为PREROUTING INPUT FORWARD OUTPUT POATROUTING。我们可以向iptable
-s中加入不同的过滤规则，实现特定功能。在本次实验中我们测试了iptables的基本accept、drop、reject动作和nat过滤功能。
+ipatables是一个常用的包过滤防火墙应用。但是，用户的安全设定实际上是由操作系统内部的一个数据包处理模块（netfilter）执行的，我们可以把iptab
+les看做一个客户端代理。iptables的核心为四表五链。四表为raw表、mangle表、net表、filter表。五链为PREROUTING
+ INPUT FORWARD OUTPUT POATROUTING。我们可以向iptables中加入不同的过滤规则，实现特定功能。在本次实验中我们测试了ipta
+bles的基本accept、drop、reject动作和nat过滤功能。
 \end_layout
 
 \begin_layout Abstract
@@ -282,7 +283,7 @@ s中加入不同的过滤规则，实现特定功能。在本次实验中我们�
 \end_layout
 
 \begin_layout Abstract
-关键字：iptables l7filter
+关键字：iptables、l7filter、包过滤、防火墙、应用层网关
 \end_layout
 
 \begin_layout Abstract
@@ -1670,7 +1671,7 @@ sudo iptables -I FORWARD -s 192.168.1.2 -p tcp --dport 8889 -j ACCEPT
 \end_layout
 
 \begin_layout Standard
-curl测试能否访问主机8889端口
+curl测试能否访问主机8889端口:
 \end_layout
 
 \begin_layout Standard
@@ -1716,7 +1717,7 @@ curl测试
 \end_layout
 
 \begin_layout Standard
-wireshark抓包结果
+wireshark抓包结果:
 \end_layout
 
 \begin_layout Standard
@@ -2786,12 +2787,22 @@ l7filter支持的过滤协议中还包括qq、迅雷、pop3、telnet、tor、ssl
 \end_layout
 
 \begin_layout Section
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part
 小结
 \end_layout
 
 \begin_layout Standard
 本次试验先是测试了如何使用iptables。先使用了ipatable基本的ACCEPT/DROP/REJECT功能。通过这些功能，服务器或客户端可以根据规则允许
-或拒绝访问。然后我们测试了iptables的nat过滤功能
+或拒绝访问。然后我们测试了iptables的nat过滤功能。使用该功能可以对NAT网关配置防火墙，限制内网主机访问外网的能力或屏蔽外网发往内网的数据包。在测试i
+ptables各项功能的实验中，我们遇到route表会被vmware强制刷新的问题。为了解决该问题，我们在每次实验前会对route表重新检查设定，以保证实验的正
+常进行。
 \end_layout
 
 \end_body
