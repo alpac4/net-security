@@ -266,7 +266,23 @@ ipatables及l7filter的使用
 \end_layout
 
 \begin_layout Abstract
-这里是摘要内容。
+ipatables是一个常用的包过滤防火墙应该用。它将用户的安全设定执行到操作系统内部的一个数据包处理模块netfilter。iptables的核心为四表五链。
+四表为raw表、mangle表、net表。五链为PREROUTING INPUT FORWARD OUTPUT POATROUTING。我们可以向iptable
+s中加入不同的过滤规则，实现特定功能。在本次实验中我们测试了iptables的基本accept、drop、reject动作和nat过滤功能。
+\end_layout
+
+\begin_layout Abstract
+然而netfilter不带有应用层过滤的功能。想要实现应用层协议的过滤，我们选用了l7filter。l7filter从2013年就没有维护，必须选择较老的操作系
+统，在本次实验中我们选用centos6.9进行实验。实验需要先对内核打补丁，增加iptables根据应用层协议类型过滤包的功能。完成试验后，能针对性的过滤应用层协
+议为http、qq等的包。
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Abstract
+关键字：iptables l7filter
 \end_layout
 
 \begin_layout Abstract
@@ -305,8 +321,8 @@ iptables与netfilter
 \end_layout
 
 \begin_layout Standard
-iptables其实不是真正的防火墙，我们可以把它看做一个客户端代理。用户通过iptables这个代理将，将用户的安全设定执行到netfilter中。netfi
-lter才是真正的防火墙。netfilter是linux操作系统内部的一个数据包处理模块，它具有如下功能：数据包内容修改、数据包过滤的防火墙功能。
+iptables其实不是真正的防火墙，我们可以把它看做一个客户端代理。用户通过iptables这个代理，将用户的安全设定执行到netfilter中。netfil
+ter才是真正的防火墙。netfilter是linux操作系统内部的一个数据包处理模块，它具有如下功能：数据包内容修改、数据包过滤的防火墙功能。
 \end_layout
 
 \begin_layout Subsection
@@ -807,7 +823,7 @@ vmware NAT模式示意图：我们在
 /Library/Preferences/VMware Fusion/vmnet8/dhcpd.conf
 \shape default
 中配置虚拟DHCP服务器分配ip地址范围为172.16.176.128-172.16.176.254。两台试验用虚拟机使用固定ip 172.16.176.253和172.16.176.
-137。vmnet8的ip为172.16.176.2。主机的ip为192.168.43.245。
+137。vmnet8的ip为172.16.176.2。主机的ip为192.168.1.2。
 \end_layout
 
 \end_inset
@@ -825,7 +841,921 @@ vmware NAT模式示意图：我们在
 \end_layout
 
 \begin_layout Standard
-我们使用虚拟机1为客户端，虚拟机2为路由，主机网卡为服务器端
+我们使用虚拟机1为客户端，虚拟机2为路由，主机网卡为服务器端。
+\end_layout
+
+\begin_layout Subsubsection
+配置路由表
+\end_layout
+
+\begin_layout Standard
+一开始虚拟机1与虚拟机2的路由表如下图所示：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/client-route.png
+	lyxscale 20
+	width 70line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+客户端虚拟机路由表
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/router-route.png
+	lyxscale 20
+	width 70line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+路由虚拟机路由表
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+虚拟机路由表
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+配置客户端虚拟机路由表：删除第一条（默认网关为vmware虚拟网关），添加默认网关为路由虚拟机。添加方法与结果如下：
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# 删除源默认网关
+\end_layout
+
+\begin_layout Plain Layout
+
+$ sudo route del default
+\end_layout
+
+\begin_layout Plain Layout
+
+# 添加新默认网关
+\end_layout
+
+\begin_layout Plain Layout
+
+$ sudo route add default gw 172.16.176.137
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+最终客户端路由表如下图所示：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/client-new-route.png
+	lyxscale 30
+	width 70line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+客户端路由表
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+配置路由虚拟机转发功能：
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+temp@ubuntu:~$ sudo sysctl -w net.ipv4.ip_forward=1
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+验证配置正确
+\end_layout
+
+\begin_layout Standard
+我们在客户端虚拟机ping服务器主机，使用traceroute观察转发路径。测试成功！
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/traceroute.png
+	lyxscale 70
+	width 70line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+traceroute测试结果
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+实验内容
+\end_layout
+
+\begin_layout Subsubsection
+测试基本功能
+\end_layout
+
+\begin_layout Standard
+这一阶段我们使用虚拟机1和虚拟机2进行测试。虚拟机2在8888和8889端口分别跑有两个http服务。在虚拟机1上curl都能得到回显结果：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/curl.png
+	width 50line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+curl结果
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+ACCEPT/DROP icmp包
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+设置虚拟机2的规则如下
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# 先接受icmp
+\end_layout
+
+\begin_layout Plain Layout
+
+iptables -A INPUT -p icmp -j ACCEPT
+\end_layout
+
+\begin_layout Plain Layout
+
+iptables -A OUTPUT -p icmp -j ACCEPT
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+此时可以虚拟机1可以ping通虚拟机2, 虚拟机2也会给虚拟机1应答：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/icmp-accept-wireshark.png
+	lyxscale 30
+	width 90line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+wireshark测试结果
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/icmp-accept.png
+	lyxscale 70
+	width 50line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+ping结果
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+icmp accept
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+清空filter表规则改为drop icmp
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# 再drop icmp
+\end_layout
+
+\begin_layout Plain Layout
+
+iptables -t filter -F
+\end_layout
+
+\begin_layout Plain Layout
+
+iptables -A INPUT -p icmp -j DROP
+\end_layout
+
+\begin_layout Plain Layout
+
+iptables -A OUTPUT -p icmp -j DROP
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+此时虚拟机1不能ping通虚拟机2，并且虚拟机2无应答：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/icmp-drop-wireshark.png
+	lyxscale 30
+	width 90line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+wireshark测试结果
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/icmp-drop.png
+	lyxscale 70
+	width 50line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+ping结果
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+icmp drop：虚拟机2直接丢弃了虚拟机发送的icmp包。wireshark抓包结果分析来看，只有单向发送，没有应答。
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+其他功能测试
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+过滤敏感词：虚拟机2过滤带有`sex'的包
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+iptables -A INPUT -p tcp --dport 8888 -m string --algo kmp --string "sex"
+ -j DROP
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/string-filter.png
+	width 60line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+过滤敏感词：未添加条件前可以正常访问，添加条件后收不到应答。
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+虚拟机reject 8889端口收到的包：
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+iptables -A INPUT -p tcp --dport 8889 -j REJECT
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/8889-reject-wireshark.png
+	lyxscale 50
+	width 70line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+wireshark结果
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/8889-reject.png
+	width 70line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+curl结果
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+reject 8889测试结果：虚拟机1访问虚拟机2的8889端口。由wireshark测试结果可知虚拟机2返回了一个icmp包，告知虚拟机1他被reject。
+从而curl终止访问（不会和drop不停尝试访问）
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+NAT功能测试
+\end_layout
+
+\begin_layout Standard
+本阶段虚拟机1为客户端，虚拟机2为路由，本机为服务器端。虚拟机2不再开启服务，关闭8888和8889端口服务。主机在8889端口开启http服务。
+\end_layout
+
+\begin_layout Standard
+由于虚拟机2扮演角色为防火墙，先置默认规则为Drop
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sudo iptables -P FORWARD DROP
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+然后设置允许访问外网主机的8889端口
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sudo iptables -I FORWARD -s 192.168.1.2 -p tcp --dport 8889 -j ACCEPT
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+curl测试能否访问主机8889端口
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/curl-nat.png
+	width 70line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+curl测试
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
+wireshark抓包结果
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename assets/nat-wireshark.png
+	lyxscale 30
+	width 70line%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+wireshark测试
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Part
@@ -961,8 +1891,14 @@ status open
 \begin_layout Plain Layout
 
 [root@centos ~]# yum install -y zsh git vim gcc automake autoconf libtool
- make patch && sh -c $(curl -fsSL https://raw.githubusercontent.com/robbyrussell/o
-h-my-zsh/master/tools/install.sh)"
+ make patch 
+\backslash
+&
+\backslash
+& sh -c 
+\backslash
+$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools
+/install.sh)"
 \end_layout
 
 \end_inset
@@ -1049,10 +1985,8 @@ cp /boot/config-2.6.32-696.el6.x86_64 /usr/src/linux/.config make menuconfig　
 \end_layout
 
 \begin_layout Standard
-本文档使用article (C\SpecialChar TeX
-)文档类，语言设置为简体中文，编码使用UTF8，字体用Adobe中文字体，输出类型设置为Xe\SpecialChar TeX
-。编译的时候中文与英文之间会自动加上空
-格，方便阅读。
+本次试验先是测试了如何使用iptables。先使用了ipatable基本的ACCEPT/DROP/REJECT功能。通过这些功能，服务器或客户端可以根据规则允许
+或拒绝访问。然后我们测试了iptables的nat过滤功能
 \end_layout
 
 \end_body
