@@ -1976,7 +1976,8 @@ cp /boot/config-2.6.32-696.el6.x86_64 /usr/src/linux/.config make menuconfig　
 \end_layout
 
 \begin_layout Standard
-本次试验先是测试了如何使用iptables。先使用了ipatable基本的ACCEPT/DROP/REJECT功能
+本次试验先是测试了如何使用iptables。先使用了ipatable基本的ACCEPT/DROP/REJECT功能。通过这些功能，服务器或客户端可以禁止恶意用户
+访问mo。然后我们测试了iptables的nat过滤功能
 \end_layout
 
 \end_body
