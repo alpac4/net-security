@@ -2787,6 +2787,9 @@ l7filter支持的过滤协议中还包括qq、迅雷、pop3、telnet、tor、ssl
 \end_layout
 
 \begin_layout Section
+
+\end_layout
+
 \begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
@@ -2803,6 +2806,13 @@ l7filter支持的过滤协议中还包括qq、迅雷、pop3、telnet、tor、ssl
 或拒绝访问。然后我们测试了iptables的nat过滤功能。使用该功能可以对NAT网关配置防火墙，限制内网主机访问外网的能力或屏蔽外网发往内网的数据包。在测试i
 ptables各项功能的实验中，我们遇到route表会被vmware强制刷新的问题。为了解决该问题，我们在每次实验前会对route表重新检查设定，以保证实验的正
 常进行。
+\end_layout
+
+\begin_layout Standard
+我们在本次试验中测试了kernel版本的l7filter的功能，难点主要在编译安装l7filter。现在应用层防火墙的通用方案很少，因为各种应用层协议太多，通用
+的解决方案过于庞大难以维护。其次因为要适应于各种协议的应用层防火墙必须从应用层下就开始检测过滤，实际上是需要底层实现的支持的，比如l7filter的功能完善的版
+本就是kernel版本而非userspace版本。未来要做更好的应用层防火墙需要结合强大的流量分析手段例如使用深度学习去做更加准确的数据包分析才能获得较好的效果
+。
 \end_layout
 
 \end_body
