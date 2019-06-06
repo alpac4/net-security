@@ -340,8 +340,8 @@ ter才是真正的防火墙。netfilter是linux操作系统内部的一个数据
 \end_layout
 
 \begin_layout Standard
-进出报文从网卡到达用户空间需要经过多道关卡，这些关卡在ipatables中被称为链（chian），每个链上都放置了一串规则。图1简单形象地描述了一个数据包进出主
-机时会经过的链：
+进出报文从网卡到达用户空间需要经过多道关卡，这些关卡在iptables中被称为链（chain），每个链上都放置了一串规则。图1简单形象地描述了一个数据包进出主机
+时会经过的链：
 \end_layout
 
 \begin_layout Standard
@@ -1207,7 +1207,7 @@ status open
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -1247,7 +1247,7 @@ wireshark测试结果
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -1535,7 +1535,7 @@ status open
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -1575,7 +1575,7 @@ wireshark结果
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -1660,6 +1660,26 @@ sudo iptables -P FORWARD DROP
 \end_layout
 
 \begin_layout Standard
+添加一条默认reject的规则
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sudo iptables -A FORWARD -j REJECT
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 然后设置允许访问外网主机的8889端口
 \end_layout
 
@@ -1671,7 +1691,27 @@ status open
 
 \begin_layout Plain Layout
 
-sudo iptables -I FORWARD -s 192.168.1.2 -p tcp --dport 8889 -j ACCEPT
+sudo iptables -I FORWARD -s 114.214.245.243 -p tcp --dport 8889 -j ACCEPT
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+然后设置原地址转换
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=bash,numbers=left,numberstyle={\tiny},stepnumber=1,basicstyle={\footnotesize},breaklines=true,showstringspaces=false,tabsize=4,frame=shadowbox,commentstyle={\color{black}},keywordstyle={\color{blue}\bfseries},stringstyle={\ttfamily},keepspaces=true,breakindent=22pt,flexiblecolumns=true,breakautoindent=true,breakindent=4em,texcl=true,aboveskip=1em"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sudo iptables -t nat -I POSTROUTING -j SNAT --to-source 172.16.176.137
 \end_layout
 
 \end_inset
@@ -1958,7 +1998,12 @@ status open
 
 \begin_layout Plain Layout
 
-cd /root tar xf linux-2.6.35.8.tar.gz -C /usr/src 
+cd /root
+\end_layout
+
+\begin_layout Plain Layout
+
+tar xf linux-2.6.35.8.tar.gz -C /usr/src 
 \backslash
 
 \end_layout
@@ -1977,13 +2022,22 @@ cd /root tar xf linux-2.6.35.8.tar.gz -C /usr/src
 
 \begin_layout Plain Layout
 
-cd /usr/src/linux patch -p1 < /root/netsec/netfilter-layer7-v2.23/kernel-2.6.35-lay
-er7-2.23.patch
+cd /usr/src/linux 
 \end_layout
 
 \begin_layout Plain Layout
 
-cp /boot/config-2.6.32-696.el6.x86_64 /usr/src/linux/.config make menuconfig　
+patch -p1 < /root/netsec/netfilter-layer7-v2.23/kernel-2.6.35-layer7-2.23.patch
+\end_layout
+
+\begin_layout Plain Layout
+
+cp /boot/config-2.6.32-696.el6.x86_64 /usr/src/linux/.config 
+\end_layout
+
+\begin_layout Plain Layout
+
+make menuconfig　
 \end_layout
 
 \end_inset
@@ -2007,6 +2061,7 @@ cp /boot/config-2.6.32-696.el6.x86_64 /usr/src/linux/.config make menuconfig　
  ---> Network packet filtering framework (Netfilter) ---> Core Netfilter
  Configuration见到如下界面：
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -2725,7 +2780,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-配置丢弃http包后的centos虚拟路由表
+配置丢弃http包后的centos iptables表
 \end_layout
 
 \end_inset
